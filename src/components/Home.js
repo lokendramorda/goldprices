@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+const baseURL = process.env.REACT_APP_API_BASE_URL;
 
 const Home = () => {
   const [searchId, setSearchId] = useState("");
@@ -18,7 +19,7 @@ const Home = () => {
     setItem(null);
 
     try {
-      const response = await axios.get(`http://localhost:5000/item/${searchId}`);
+      const response = await axios.get(`${baseURL}/item/${searchId}`);
       setItem(response.data);  // Set the retrieved item data
     } catch (error) {
       if (error.response && error.response.data && error.response.data.message) {

@@ -1,10 +1,12 @@
 const express = require('express');
+const router = express.Router();
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 const multer = require('multer'); // For handling file uploads
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
+const Prices = require('./pricesSchema'); 
 
 
 // Express app setup
@@ -14,7 +16,7 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://goldprices.netlify.app']  // Frontend URLs
+  origin: ['https://goldprices.netlify.app', 'http://localhost:3000']
 }));
 
 
@@ -71,6 +73,61 @@ app.post('/upload', async (req, res) => {
   }
 });
 
+// 3. Submit gold and silver prices (update existing prices)
+app.post('/submit-prices', async (req, res) => {
+  const db = client.db('yourDatabase');
+  const pricesCollection = db.collection('prices');
+
+  const {
+    goldRtgs,
+    goldCash,
+    silverBank,
+    silverCash,
+    goldTola,
+    gold22Carat,
+    silverTola,
+    marginGold,
+    marginSilver
+  } = req.body;
+
+  // Basic validation
+  if (
+    !goldRtgs || !goldCash || !silverBank || !silverCash ||
+    !goldTola || !gold22Carat || !silverTola ||
+    !marginGold || !marginSilver
+  ) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    // Upsert one document (overwrite the previous if exists)
+    const result = await pricesCollection.updateOne(
+      { type: 'latest' }, // filter
+      {
+        $set: {
+          type: 'latest',
+          goldRtgs: parseFloat(goldRtgs),
+          goldCash: parseFloat(goldCash),
+          silverBank: parseFloat(silverBank),
+          silverCash: parseFloat(silverCash),
+          goldTola: parseFloat(goldTola),
+          gold22Carat: parseFloat(gold22Carat),
+          silverTola: parseFloat(silverTola),
+          marginGold: parseFloat(marginGold),
+          marginSilver: parseFloat(marginSilver),
+          updatedAt: new Date()
+        }
+      },
+      { upsert: true }
+    );
+
+    res.status(200).json({ message: 'Prices submitted successfully!' });
+  } catch (error) {
+    console.error('Error saving prices:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 // 2. Retrieve item by ID (send image as base64)
 app.get('/item/:id', async (req, res) => {
@@ -93,6 +150,29 @@ app.get('/item/:id', async (req, res) => {
         res.status(500).json({ message: 'Error retrieving item', error });
     }
 });
+
+app.get('/get-prices', async (req, res) => {
+  try {
+    const db = client.db('yourDatabase');
+    const pricesCollection = db.collection('prices');
+
+    const latestPrices = await pricesCollection.findOne({ type: 'latest' });
+
+    if (!latestPrices) {
+      return res.status(404).json({ message: 'No prices found' });
+    }
+
+    res.status(200).json(latestPrices);
+  } catch (error) {
+    console.error('Error fetching prices:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+
+
+module.exports = router;
 
 // Start the server
 app.listen(port, () => {
