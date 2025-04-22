@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-const baseURL = REACT_APP_API_BASE_URL;
+const baseURL = process.env.REACT_APP_API_BASE_URL
+console.log(baseURL)
 
 const PriceDisplay = () => {
   const [prices, setPrices] = useState(null);
@@ -28,10 +29,10 @@ const PriceDisplay = () => {
   const calculateBuySilver = () => prices.silverBank - prices.marginSilver;
 
   return (
-    <div className="w-full  bg-gradient-to-br from-yellow-100 via-white to-gray-100 py-12 px-6">
+    <div className="w-full min-h-screen bg-gradient-to-br from-yellow-100 via-white to-gray-100 py-12 px-6">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-extrabold text-center text-yellow-800 mb-12 tracking-wide">
-          Precious Metal Prices in INR
+          Gold/Silver live price updates
         </h2>
 
         {loading ? (
@@ -42,49 +43,49 @@ const PriceDisplay = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Gold Section */}
             <div className="bg-yellow-50 rounded-2xl shadow-lg p-6 border-t-4 border-yellow-400">
-              <h3 className="text-2xl font-bold text-yellow-800 mb-6">Gold<p className="text-sm text-gray-500">/10g</p></h3>
+              <h3 className="text-4xl font-bold text-yellow-800 mb-6">Gold<p className="text-sm text-gray-500">/10g</p></h3>
               <div className="space-y-4">
                 <div>
-                  <p className="text-lg font-medium text-yellow-700">Rtgs: ₹{prices.goldRtgs.toFixed(2)}</p>
+                  <p className="text-2xl font-medium text-yellow-700">Rtgs: ₹{prices.goldRtgs}</p>
                 </div>
                 <div>
-                  <p className="text-lg font-medium text-yellow-700">Cash: ₹{prices.goldCash.toFixed(2)}</p>
+                  <p className="text-2xl font-medium text-yellow-700">Cash: ₹{prices.goldCash}</p>
                 </div>
                 <div>
-                  <p className="text-lg font-medium text-yellow-700">Tola: ₹{prices.goldTola.toFixed(2)}</p>
+                  <p className="text-2xl font-medium text-yellow-700">Tola: ₹{Math.round(prices.goldTola)}</p>
                 </div>
                 <div>
-                  <p className="text-lg font-medium text-yellow-700">22 Carat: ₹{prices.gold22Carat.toFixed(2)}</p>
+                  <p className="text-2xl font-medium text-yellow-700">22 Carat: ₹{prices.gold22Carat.toFixed(0)}</p>
                 </div>
               </div>
             </div>
 
             {/* Silver Section */}
             <div className="bg-gray-50 rounded-2xl shadow-lg p-6 border-t-4 border-gray-400">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6">Silver <p className="text-sm text-gray-500">/kg</p></h3>
+              <h3 className="text-4xl font-bold text-gray-800 mb-6">Silver <p className="text-sm text-gray-500">/kg</p></h3>
               <div className="space-y-4">
                 <div>
-                  <p className="text-lg font-medium text-gray-700">Bank Peti: ₹{prices.silverBank.toFixed(2)}</p>
+                  <p className="text-2xl font-medium text-gray-700">Bank Peti: ₹{prices.silverBank}</p>
                 </div>
                 <div>
-                  <p className="text-lg font-medium text-gray-700">Cash: ₹{prices.silverCash.toFixed(2)}</p>
+                  <p className="text-2xl font-medium text-gray-700">Cash: ₹{prices.silverCash}</p>
                 </div>
                 <div>
-                  <p className="text-lg font-medium text-gray-700">Tola: ₹{prices.silverTola.toFixed(2)}</p>
+                  <p className="text-2xl font-medium text-gray-700">Tola: ₹{Math.round(prices.silverTola)}</p>
                 </div>
               </div>
             </div>
 
             {/* Buy Section */}
             <div className="bg-green-50 rounded-2xl shadow-lg p-6 border-t-4 border-green-400">
-              <h3 className="text-2xl font-bold text-green-800 mb-6">Buy Rates</h3>
+              <h3 className="text-4xl font-bold text-green-800 mb-6">Buy Rates</h3>
               <div className="space-y-6">
                 <div>
-                  <p className="text-xl font-semibold text-green-700">Buy Gold: ₹{calculateBuyGold().toFixed(2)}</p>
+                  <p className="text-2xl font-semibold text-green-700">Buy Gold: ₹{calculateBuyGold().toFixed(0)}</p>
                   <p className="text-sm text-gray-500">/10g</p>
                 </div>
                 <div>
-                  <p className="text-xl font-semibold text-green-700">Buy Silver: ₹{calculateBuySilver().toFixed(2)}</p>
+                  <p className="text-2xl font-semibold text-green-700">Buy Silver: ₹{calculateBuySilver().toFixed(0)}</p>
                   <p className="text-sm text-gray-500">/kg</p>
                 </div>
               </div>

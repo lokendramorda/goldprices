@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { FiTrash } from "react-icons/fi";
 const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
 const ItemUpload = () => {
@@ -11,7 +12,9 @@ const ItemUpload = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [priceMessage, setPriceMessage] = useState("");
-  
+  const [deleteItemId, setDeleteItemId] = useState("");
+  const [deleteMessage, setDeleteMessage] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -71,7 +74,7 @@ const ItemUpload = () => {
 
     setDerived({
       goldTola: (rtgs * 11.664) / 10,
-      gold22Carat: (rtgs * 93.5) / 10,
+      gold22Carat: (rtgs * 93.5) / 100,
       silverTola: (silverCash * 11.664) / 1000,
     });
   }, [prices]);
@@ -97,8 +100,7 @@ const ItemUpload = () => {
       {/* Item Upload */}
       <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-4 text-yellow-700">Upload New Item</h2>
-        {message && <p className="text-center text-sm text-red-500">{message}</p>}
-
+        {message && ( <p className={`text-center text-sm ${message.toLowerCase().includes("success") ? "text-green-600": "text-red-500"}`}>{message}</p>)}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium">Item ID</label>
@@ -159,7 +161,8 @@ const ItemUpload = () => {
       </div>
 
       {/* Price Upload */}
-      <div className="w-full lg:w-1/2 bg-white p-6 rounded-lg shadow-md">
+      <div >
+      <div className="w-full  bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-4 text-yellow-700">Upload Daily Prices</h2>
         {priceMessage && (
           <p className={`text-center text-sm mt-2 ${priceMessage.startsWith("❌") ? "text-red-500" : "text-green-600"}`}>
@@ -190,6 +193,59 @@ const ItemUpload = () => {
             Submit Prices
           </button>
         </form>
+      </div>
+      {/* Delete Item by ID */}
+<div className="w-full mt-12 bg-white p-6 rounded-lg shadow-md">
+  <h2 className="text-2xl font-bold text-center mb-4 text-yellow-700">Delete Item by ID</h2>
+  {deleteMessage && (
+  <p className={`text-center mt-2 ${deleteMessage.startsWith("❌") ? "text-red-500" : "text-green-600"}`}>
+    {deleteMessage}
+  </p>
+)}
+  <div className="mb-4">
+        </div>
+        <form
+ onSubmit={async (e) => {
+  e.preventDefault();
+  setDeleting(true);
+  setDeleteMessage("");
+
+  if (!deleteItemId) {
+    setDeleteMessage("Please provide a valid Item ID to delete.");
+    setDeleting(false);
+    return;
+  }
+
+  try {
+    const response = await axios.delete(`${baseURL}/delete-item-by-itemId/${deleteItemId}`);
+    setDeleteMessage(response.data.message || "Item deleted successfully.");
+    setDeleteItemId(""); // Clear input after deletion
+  } catch (error) {
+    setDeleteMessage(`❌ ${error.response?.data?.message || 'Unable to delete item'}`);
+  } finally {
+    setDeleting(false);
+  }
+}}
+>
+    <div className="flex gap-4 items-center">
+      <input
+        type="text"
+        placeholder="Enter Item ID"
+        value={deleteItemId}
+        onChange={(e) => setDeleteItemId(e.target.value)}
+        className="flex-1 p-2 border border-gray-300 rounded"
+      />
+      <button
+  type="submit"
+  className="bg-red-600 flex items-center justify-center gap-2 text-white px-4 py-2 rounded hover:bg-red-700"
+>
+  {deleting? <p>Deleting...</p>:<p>Delete</p>} <FiTrash className="text-lg" />
+</button>
+
+    </div>
+  </form>
+</div>
+
       </div>
     </div>
   );

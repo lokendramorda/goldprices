@@ -73,6 +73,30 @@ app.post('/upload', async (req, res) => {
   }
 });
 
+
+// 2. Retrieve item by ID (send image as base64)
+app.get('/item/:id', async (req, res) => {
+    const itemId = req.params.id;
+    const itemsCollection = client.db('yourDatabase').collection('items');
+
+    try {
+        const item = await itemsCollection.findOne({ itemId });
+        if (!item) {
+            return res.status(404).json({ message: 'Item not found' });
+        }
+
+        // Convert image buffer back to base64
+        const base64Image = item.photo.toString('base64');
+        const imageUrl = `data:image/png;base64,${base64Image}`;
+        
+        // Include the image in the response
+        res.status(200).json({ ...item, photo: imageUrl });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving item', error });
+    }
+});
+
+
 // 3. Submit gold and silver prices (update existing prices)
 app.post('/submit-prices', async (req, res) => {
   const db = client.db('yourDatabase');
@@ -129,28 +153,7 @@ app.post('/submit-prices', async (req, res) => {
 });
 
 
-// 2. Retrieve item by ID (send image as base64)
-app.get('/item/:id', async (req, res) => {
-    const itemId = req.params.id;
-    const itemsCollection = client.db('yourDatabase').collection('items');
-
-    try {
-        const item = await itemsCollection.findOne({ itemId });
-        if (!item) {
-            return res.status(404).json({ message: 'Item not found' });
-        }
-
-        // Convert image buffer back to base64
-        const base64Image = item.photo.toString('base64');
-        const imageUrl = `data:image/png;base64,${base64Image}`;
-        
-        // Include the image in the response
-        res.status(200).json({ ...item, photo: imageUrl });
-    } catch (error) {
-        res.status(500).json({ message: 'Error retrieving item', error });
-    }
-});
-
+// 4. Get gold and silver prices 
 app.get('/get-prices', async (req, res) => {
   try {
     const db = client.db('yourDatabase');
@@ -169,6 +172,26 @@ app.get('/get-prices', async (req, res) => {
   }
 });
 
+
+// 5. Delete an Item by ID
+app.delete('/delete-item-by-itemId/:id', async (req, res) => {
+  const itemId = req.params.id;
+  const itemsCollection = client.db('yourDatabase').collection('items');
+
+  try {
+      // Attempt to find and delete the item by itemId
+      const result = await itemsCollection.deleteOne({ itemId });
+
+      if (result.deletedCount === 0) {
+          return res.status(404).json({ message: 'Item not found or already deleted' });
+      }
+
+      res.status(200).json({ message: `Item with ID ${itemId} deleted successfully` });
+  } catch (error) {
+      console.error('❌ Error deleting item:', error);
+      res.status(500).json({ message: 'Error deleting item', error });
+  }
+});
 
 
 
