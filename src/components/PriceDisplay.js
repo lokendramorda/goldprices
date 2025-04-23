@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
+import PriceTicker from './PriceTicker';
 const baseURL = process.env.REACT_APP_API_BASE_URL
-console.log(baseURL)
 
 const PriceDisplay = () => {
   const [prices, setPrices] = useState(null);
@@ -29,8 +29,8 @@ const PriceDisplay = () => {
   const calculateBuySilver = () => prices.silverBank - prices.marginSilver;
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-yellow-100 via-white to-gray-100 py-12 px-6">
-      <div className="max-w-7xl mx-auto">
+    <div className=" min-h-screen flex flex-col bg-gradient-to-br from-yellow-100 via-white to-gray-100 pt-12 pb-4 px-6">
+      <div className="w-full max-w-7xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-extrabold text-center text-yellow-800 mb-12 tracking-wide">
           Gold/Silver live price updates
         </h2>
@@ -93,13 +93,19 @@ const PriceDisplay = () => {
           </div>
         )}
 
-        {/* Footer Time */}
-        <div className="text-center text-sm text-gray-600 mt-12">
+       
+      </div>
+     
+      <div className="text-center text-sm text-gray-600 mt-auto">
+        {!loading && !error && prices && (
+ <PriceTicker prices={prices} buyGold={calculateBuyGold()}  buySilver={calculateBuySilver()}/>
+   )}
+
           <p>
             Last updated at <span className="font-semibold">{lastUpdated}</span>
           </p>
         </div>
-      </div>
+
     </div>
   );
 };
