@@ -82,11 +82,11 @@ const PriceDisplay = () => {
               <div className="space-y-6">
                 <div>
                   <p className="text-2xl font-semibold text-green-700">Buy Gold: ₹{calculateBuyGold().toFixed(0)}</p>
-                  <p className="text-sm text-gray-500">/10g</p>
+                  <p className="text-sm text-gray-500 font-bold">/10g</p>
                 </div>
                 <div>
                   <p className="text-2xl font-semibold text-green-700">Buy Silver: ₹{calculateBuySilver().toFixed(0)}</p>
-                  <p className="text-sm text-gray-500">/kg</p>
+                  <p className="text-sm text-gray-500 font-bold">/kg</p>
                 </div>
               </div>
             </div>

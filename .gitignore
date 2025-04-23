@@ -12,12 +12,20 @@
 /build
 
 
-# dotenv environment variables
+# Root-level .env files
 .env
 .env.*.local
 .env.local
 .env.production
 .env.development
+
+# Backend environment files
+/backend/.env
+/backend/.env.*.local
+/backend/.env.local
+/backend/.env.production
+/backend/.env.development
+
 
 # misc
 .DS_Store
